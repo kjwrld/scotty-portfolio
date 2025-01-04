@@ -1,114 +1,98 @@
 // DesktopIcon.tsx
-import React, { useState, forwardRef, useRef, useEffect } from "react";
+import React, { useState, forwardRef, useRef } from "react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { DesktopIconProps } from "./types";
 
-// Breakpoint sizes in pixels
-const BREAKPOINTS = {
-    MOBILE: 480,
-    TABLET: 768,
-    LAPTOP: 1024,
-    DESKTOP: 1200,
-};
-
-const ICON_SIZES = {
-    MOBILE: 80, // Minimum size
-    TABLET: 85, // Slightly larger
-    LAPTOP: 90, // Even larger
-    DESKTOP: 100, // Maximum size
-};
-
 export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
-    ({ id, icon, name, position, onDragStop }) => {
+    ({ id, icon, name, position, onDragStop, onDoubleClick }) => {
         const [isTouching, setIsTouching] = useState(false);
+        const [isDragging, setIsDragging] = useState(false);
         const nodeRef = useRef<HTMLDivElement>(null);
-        const [iconSize, setIconSize] = useState(ICON_SIZES.DESKTOP);
+        let dragStartTime = 0;
 
-        useEffect(() => {
-            const updateSize = () => {
-                const width = window.innerWidth;
-                if (width <= BREAKPOINTS.MOBILE) {
-                    setIconSize(ICON_SIZES.MOBILE);
-                } else if (width <= BREAKPOINTS.TABLET) {
-                    setIconSize(ICON_SIZES.TABLET);
-                } else if (width <= BREAKPOINTS.LAPTOP) {
-                    setIconSize(ICON_SIZES.LAPTOP);
-                } else {
-                    setIconSize(ICON_SIZES.DESKTOP);
-                }
-            };
-
-            updateSize();
-            window.addEventListener("resize", updateSize);
-            return () => window.removeEventListener("resize", updateSize);
-        }, []);
-
-        const containerStyle: React.CSSProperties = {
-            position: "absolute",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            width: `${iconSize + 20}px`,
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            touchAction: "none",
-            opacity: isTouching ? 0.7 : 1,
+        const handleMouseDown = () => {
+            dragStartTime = Date.now();
+            setIsDragging(false);
         };
 
-        const imgStyle: React.CSSProperties = {
-            width: `${iconSize}px`,
-            height: `${iconSize}px`,
-            marginBottom: "8px",
-            WebkitTouchCallout: "none",
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            MozUserSelect: "none",
-            msUserSelect: "none",
-            objectFit: "contain",
+        const handleMouseUp = () => {
+            const dragDuration = Date.now() - dragStartTime;
+            if (dragDuration < 200) {
+                setIsDragging(false);
+            }
         };
 
-        const labelStyle: React.CSSProperties = {
-            fontSize: "14px",
-            textAlign: "center",
-            // color: "white",
-            color: "black",
-            WebkitTouchCallout: "none",
-            padding: "4px",
-            maxWidth: `${iconSize + 16}px`,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            wordWrap: "break-word",
+        const handleDragStart = () => {
+            setIsDragging(true);
+        };
+
+        const handleDragStop = (e: DraggableEvent, data: DraggableData) => {
+            if (!isDragging) {
+                onDragStop(id, { x: data.x, y: data.y });
+            }
+            setIsDragging(false);
+        };
+
+        const handleDoubleClick = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            console.log("Double click detected"); // Debug log
+            onDoubleClick(id);
         };
 
         return (
             <Draggable
                 nodeRef={nodeRef}
                 defaultPosition={position}
-                onStop={(_: DraggableEvent, data: DraggableData) =>
-                    onDragStop(id, { x: data.x, y: data.y })
-                }
+                onStart={handleDragStart}
+                onStop={handleDragStop}
                 bounds="parent"
-                handle=".handle"
-                enableUserSelectHack={true}
                 cancel=".icon-label"
             >
                 <div
                     ref={nodeRef}
-                    style={containerStyle}
+                    style={{
+                        position: "absolute",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100px",
+                        userSelect: "none",
+                        WebkitUserSelect: "none",
+                        touchAction: "none",
+                        opacity: isTouching ? 0.7 : 1,
+                        cursor: "pointer",
+                    }}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
                     onTouchStart={() => setIsTouching(true)}
                     onTouchEnd={() => setIsTouching(false)}
+                    onDoubleClick={handleDoubleClick}
                 >
-                    <div
-                        className="handle"
-                        style={{ cursor: "move", touchAction: "none" }}
-                    >
+                    <div className="icon-wrapper">
                         <img
                             src={icon}
                             alt={name}
-                            style={imgStyle}
+                            style={{
+                                width: "80px",
+                                height: "80px",
+                                marginBottom: "8px",
+                                pointerEvents: "none",
+                            }}
                             draggable={false}
                         />
-                        <div className="icon-label" style={labelStyle}>
+                        <div
+                            className="icon-label"
+                            style={{
+                                fontSize: "14px",
+                                textAlign: "center",
+                                color: "white",
+                                maxWidth: "90px",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                wordWrap: "break-word",
+                                pointerEvents: "none",
+                            }}
+                        >
                             {name}
                         </div>
                     </div>

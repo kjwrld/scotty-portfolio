@@ -1,4 +1,3 @@
-// types.ts
 export interface Position {
     x: number;
     y: number;
@@ -13,8 +12,12 @@ export interface DesktopIconData {
 
 export interface DesktopIconProps extends DesktopIconData {
     onDragStop: (id: string, position: Position) => void;
-    iconSize?: {
-        width: number;
-        height: number;
-    };
+    onDoubleClick: (id: string) => void;
 }
+
+export const ICON_DIMENSIONS = {
+    width: 100,
+    imageSize: 80,
+    singleLineHeight: 120,
+    doubleLineHeight: 140,
+} as const;

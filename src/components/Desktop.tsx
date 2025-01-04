@@ -3,15 +3,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { DesktopIcon } from "./DesktopIcon";
 import { DesktopIconData, Position } from "./types";
 import folderIcon from "../assets/folder.png";
+import { ICON_DIMENSIONS } from "./types";
+import { Drawer } from "./Drawer";
 
 const ICON_SIZE = {
-    width: 100,
-    height: 140, // Including text below icon
+    width: ICON_DIMENSIONS.width,
+    height: ICON_DIMENSIONS.doubleLineHeight,
 };
 
 export const Desktop: React.FC = () => {
     const desktopRef = useRef<HTMLDivElement>(null);
     const [isMobile, setIsMobile] = useState(false);
+    const [openDrawer, setOpenDrawer] = useState(false); // Added for drawer
+    const [selectedFolder, setSelectedFolder] = useState(""); // Added for drawer
     const [dimensions, setDimensions] = useState({
         width: window.innerWidth,
         height: window.innerHeight,
@@ -166,6 +170,15 @@ export const Desktop: React.FC = () => {
         );
     };
 
+    // Add handler for double click
+    const handleDoubleClick = (id: string) => {
+        const folder = icons.find((icon) => icon.id === id);
+        if (folder) {
+            setSelectedFolder(folder.name);
+            setOpenDrawer(true);
+        }
+    };
+
     return (
         <div
             ref={desktopRef}
@@ -177,8 +190,7 @@ export const Desktop: React.FC = () => {
                 bottom: 0,
                 width: "100vw",
                 height: "100vh",
-                // backgroundColor: "#2196f3",
-                backgroundColor: "#ffffff",
+                backgroundColor: "#2196f3",
                 overflow: "hidden",
                 touchAction: "none",
             }}
@@ -199,9 +211,15 @@ export const Desktop: React.FC = () => {
                             isMobile ? getMobilePosition(index) : icon.position
                         }
                         onDragStop={handleDragStop}
+                        onDoubleClick={handleDoubleClick} // Added double click handler
                     />
                 ))}
             </div>
+            <Drawer
+                isOpen={openDrawer}
+                onClose={() => setOpenDrawer(false)}
+                folderName={selectedFolder}
+            />
         </div>
     );
 };
