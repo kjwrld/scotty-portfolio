@@ -21,17 +21,20 @@ export const Desktop: React.FC = () => {
         },
     ]);
 
+    // Prevent all scrolling
     useEffect(() => {
-        const preventDefault = (e: TouchEvent) => {
-            e.preventDefault();
-        };
-
-        document.addEventListener("touchmove", preventDefault, {
-            passive: false,
-        });
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.width = "100%";
+        document.documentElement.style.height = "100%";
 
         return () => {
-            document.removeEventListener("touchmove", preventDefault);
+            document.body.style.overflow = "";
+            document.documentElement.style.overflow = "";
+            document.documentElement.style.position = "";
+            document.documentElement.style.width = "";
+            document.documentElement.style.height = "";
         };
     }, []);
 
@@ -43,7 +46,11 @@ export const Desktop: React.FC = () => {
         <div
             ref={desktopRef}
             style={{
-                position: "relative",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
                 width: "100vw",
                 height: "100vh",
                 backgroundColor: "#2196f3",
