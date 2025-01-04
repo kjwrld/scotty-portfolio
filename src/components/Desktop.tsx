@@ -2,19 +2,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { DesktopIcon } from "./DesktopIcon";
 import { DesktopIconData, Position } from "./types";
+import folderIcon from "../assets/folder.png";
 
 export const Desktop: React.FC = () => {
     const desktopRef = useRef<HTMLDivElement>(null);
     const [icons] = useState<DesktopIconData[]>([
         {
             id: "1",
-            icon: "/folder.png",
+            icon: folderIcon,
             name: "About Me",
             position: { x: 20, y: 20 },
         },
         {
             id: "2",
-            icon: "/folder.png",
+            icon: folderIcon,
             name: "Pictures I Took",
             position: { x: 20, y: 120 },
         },

@@ -4,7 +4,7 @@ import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { DesktopIconProps } from "./types";
 
 export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
-    ({ id, icon, name, position, onDragStop }, ref) => {
+    ({ id, icon, name, position, onDragStop }) => {
         const [isTouching, setIsTouching] = useState(false);
         const nodeRef = useRef<HTMLDivElement>(null);
 
@@ -16,7 +16,7 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
             setIsTouching(false);
         };
 
-        const handleDragStop = (e: DraggableEvent, data: DraggableData) => {
+        const handleDragStop = (_: DraggableEvent, data: DraggableData) => {
             onDragStop(id, { x: data.x, y: data.y });
         };
 
