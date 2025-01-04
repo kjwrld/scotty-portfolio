@@ -5,18 +5,17 @@ import { DesktopIconProps } from "./types";
 
 // Breakpoint sizes in pixels
 const BREAKPOINTS = {
-    MOBILE: 480, // Phones
-    TABLET: 768, // Tablets/iPads
-    LAPTOP: 1024, // Smaller laptops
-    DESKTOP: 1200, // Larger screens
+    MOBILE: 480,
+    TABLET: 768,
+    LAPTOP: 1024,
+    DESKTOP: 1200,
 };
 
-// Icon sizes for different breakpoints
 const ICON_SIZES = {
-    MOBILE: 48, // Comfortable touch target for phones
-    TABLET: 56, // Slightly larger for tablets
-    LAPTOP: 64, // Good size for laptop viewing
-    DESKTOP: 72, // Largest size for big screens
+    MOBILE: 80, // Minimum size
+    TABLET: 85, // Slightly larger
+    LAPTOP: 90, // Even larger
+    DESKTOP: 100, // Maximum size
 };
 
 export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
@@ -25,7 +24,6 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
         const nodeRef = useRef<HTMLDivElement>(null);
         const [iconSize, setIconSize] = useState(ICON_SIZES.DESKTOP);
 
-        // Handle window resize
         useEffect(() => {
             const updateSize = () => {
                 const width = window.innerWidth;
@@ -40,26 +38,17 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
                 }
             };
 
-            // Set initial size
             updateSize();
-
-            // Add resize listener
             window.addEventListener("resize", updateSize);
             return () => window.removeEventListener("resize", updateSize);
         }, []);
-
-        const handleTouchStart = () => setIsTouching(true);
-        const handleTouchEnd = () => setIsTouching(false);
-        const handleDragStop = (_: DraggableEvent, data: DraggableData) => {
-            onDragStop(id, { x: data.x, y: data.y });
-        };
 
         const containerStyle: React.CSSProperties = {
             position: "absolute",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: `${iconSize + 20}px`, // Add padding for text
+            width: `${iconSize + 20}px`,
             userSelect: "none",
             WebkitUserSelect: "none",
             touchAction: "none",
@@ -79,14 +68,10 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
         };
 
         const labelStyle: React.CSSProperties = {
-            fontSize:
-                iconSize <= ICON_SIZES.MOBILE
-                    ? "11px"
-                    : iconSize <= ICON_SIZES.TABLET
-                    ? "12px"
-                    : "14px",
+            fontSize: "14px",
             textAlign: "center",
-            color: "white",
+            // color: "white",
+            color: "black",
             WebkitTouchCallout: "none",
             padding: "4px",
             maxWidth: `${iconSize + 16}px`,
@@ -95,16 +80,13 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
             wordWrap: "break-word",
         };
 
-        const handleStyle: React.CSSProperties = {
-            cursor: "move",
-            touchAction: "none",
-        };
-
         return (
             <Draggable
                 nodeRef={nodeRef}
                 defaultPosition={position}
-                onStop={handleDragStop}
+                onStop={(_: DraggableEvent, data: DraggableData) =>
+                    onDragStop(id, { x: data.x, y: data.y })
+                }
                 bounds="parent"
                 handle=".handle"
                 enableUserSelectHack={true}
@@ -113,10 +95,13 @@ export const DesktopIcon = forwardRef<HTMLDivElement, DesktopIconProps>(
                 <div
                     ref={nodeRef}
                     style={containerStyle}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={handleTouchEnd}
+                    onTouchStart={() => setIsTouching(true)}
+                    onTouchEnd={() => setIsTouching(false)}
                 >
-                    <div className="handle" style={handleStyle}>
+                    <div
+                        className="handle"
+                        style={{ cursor: "move", touchAction: "none" }}
+                    >
                         <img
                             src={icon}
                             alt={name}
